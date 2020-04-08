@@ -31,17 +31,23 @@ app.get("/api/timestamp/:date_string?", function (req, res) {
     return res.json({"unix": new Date().getTime(), "utc" : new Date().toUTCString() });
   }
   
-  if(dateString.includes('-')){
-   return res.json({"unix": new Date(dateString).getTime(), "utc" : new Date(dateString).toUTCString() }); 
+  if (/\b\d{5,}\b/.test(dateString)){
+    const parsed_date = new Date(parseInt(dateString));
+  
+    if (parsed_date.toString() === "Invalid Date"){
+      return res.json({ error: "Invaid Date" })
+    }
+    
+    return res.json({"unix": parsed_date.getTime(), "utc" : parsed_date.toUTCString() });
   }
   
-  const parsed_date = new Date(parseInt(dateString));
+  const date = new Date(dateString).toString();
   
-  if (parsed_date.toString() === "Invalid Date"){
-    return res.json({ unix: null, utc: "Invaid Date" })
+  if (date === 'Invalid Date'){
+    return res.json({error: date})
   }
   
-  return res.json({"unix": parsed_date.getTime(), "utc" : parsed_date.toUTCString() });
+  return res.json( {"unix": new Date(dateString).getTime(), "utc" : new Date(dateString).toUTCString()} );
 });
 
 // listen for requests :)
